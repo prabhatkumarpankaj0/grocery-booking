@@ -2,12 +2,14 @@ package com.example.grocery_booking.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "grocery_item")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroceryItem {
