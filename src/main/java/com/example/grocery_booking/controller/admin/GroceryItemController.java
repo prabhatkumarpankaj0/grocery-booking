@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("adminGroceryItemController")
 @RequestMapping("/admin/groceryItem")
 public class GroceryItemController {
 

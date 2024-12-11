@@ -1,7 +1,6 @@
 package com.example.grocery_booking.services.implementation;
 
 import com.example.grocery_booking.dto.GroceryItemDto;
-import com.example.grocery_booking.dto.response.GroceryItemResponse;
 import com.example.grocery_booking.exception.ResourceNotFoundException;
 import com.example.grocery_booking.model.GroceryItem;
 import com.example.grocery_booking.model.InventoryLevel;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -61,12 +61,18 @@ public class GroceryItemServiceImpl implements GroceryItemService {
     @Override
     public List<GroceryItemDto> getAllGroceryItems() {
         List<GroceryItem> groceryItems = groceryItemRepository.findAll();
+        List<InventoryLevel> inventoryLevels = inventoryLevelRepository.findAll();
+        Map<Long, InventoryLevel> groceryIdInventoryMap = inventoryLevels.stream()
+                .collect(Collectors.toMap(inventoryLevel -> inventoryLevel.getGroceryItem().getId(),
+                        inventoryLevel -> inventoryLevel));
+
         return groceryItems.stream().map(
                 groceryItem -> GroceryItemDto.builder()
                         .id(groceryItem.getId())
                         .name(groceryItem.getName())
                         .description(groceryItem.getDescription())
                         .price(groceryItem.getPrice())
+                        .inventoryQuantity(groceryIdInventoryMap.get(groceryItem.getId()).getStock())
                         .build())
                 .collect(Collectors.toList());
     }

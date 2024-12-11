@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GroceryItemService {
 
-    public void addOrUpdateGroceryItem(GroceryItemDto groceryItemDto);
-    public void deleteGroceryItem(Long groceryItemId);
-    public List<GroceryItemDto> getAllGroceryItems();
+    void addOrUpdateGroceryItem(GroceryItemDto groceryItemDto);
+    void deleteGroceryItem(Long groceryItemId);
+    List<GroceryItemDto> getAllGroceryItems();
 }
