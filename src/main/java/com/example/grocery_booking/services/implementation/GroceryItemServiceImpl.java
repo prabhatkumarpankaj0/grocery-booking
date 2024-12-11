@@ -1,6 +1,7 @@
 package com.example.grocery_booking.services.implementation;
 
 import com.example.grocery_booking.dto.GroceryItemDto;
+import com.example.grocery_booking.dto.response.GroceryItemResponse;
 import com.example.grocery_booking.exception.ResourceNotFoundException;
 import com.example.grocery_booking.model.GroceryItem;
 import com.example.grocery_booking.model.InventoryLevel;
@@ -11,7 +12,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class GroceryItemServiceImpl implements GroceryItemService {
@@ -54,4 +57,19 @@ public class GroceryItemServiceImpl implements GroceryItemService {
         groceryItemRepository.deleteById(groceryItemId);
         inventoryLevelRepository.deleteInventoryLevelByGroceryItem_Id(groceryItemId);
     }
+
+    @Override
+    public List<GroceryItemDto> getAllGroceryItems() {
+        List<GroceryItem> groceryItems = groceryItemRepository.findAll();
+        return groceryItems.stream().map(
+                groceryItem -> GroceryItemDto.builder()
+                        .id(groceryItem.getId())
+                        .name(groceryItem.getName())
+                        .description(groceryItem.getDescription())
+                        .price(groceryItem.getPrice())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 }
