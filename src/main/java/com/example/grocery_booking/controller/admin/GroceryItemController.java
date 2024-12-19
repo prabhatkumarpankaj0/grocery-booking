@@ -6,6 +6,7 @@ import com.example.grocery_booking.dto.response.BaseResponse;
 import com.example.grocery_booking.dto.response.GroceryItemResponse;
 import com.example.grocery_booking.services.service.GroceryItemService;
 import com.example.grocery_booking.utils.MessageConstant;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +17,15 @@ import java.util.List;
 @RequestMapping("/admin/groceryItem")
 public class GroceryItemController {
 
+    private final GroceryItemService groceryItemService;
+
     @Autowired
-    private GroceryItemService groceryItemService;
+    public GroceryItemController(GroceryItemService groceryItemService) {
+        this.groceryItemService = groceryItemService;
+    }
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse<Object>> addOrUpdateGroceryItem(@RequestBody AddGroceryItemRequest request) {
+    public ResponseEntity<BaseResponse<Object>> addOrUpdateGroceryItem(@RequestBody @Valid AddGroceryItemRequest request) {
         try {
             GroceryItemDto groceryItemDto = GroceryItemDto.builder()
                     .id(request.getId())

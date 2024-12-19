@@ -14,14 +14,18 @@ import java.util.stream.Collectors;
 @Service
 public class InventoryLevelServiceImpl implements InventoryLevelService {
 
+    private final InventoryLevelRepository inventoryLevelRepository;
+
     @Autowired
-    private InventoryLevelRepository inventoryLevelRepository;
+    public InventoryLevelServiceImpl(InventoryLevelRepository inventoryLevelRepository) {
+        this.inventoryLevelRepository = inventoryLevelRepository;
+    }
 
     @Override
     public void updateInventoryLevels(List<InventoryLevelDto> inventoryLevelDtoList) {
         List<Long> inventoryLevelIds = inventoryLevelDtoList.stream()
                 .map(InventoryLevelDto::getInventoryId)
-                .collect(Collectors.toList());
+                .toList();
 
         List<InventoryLevel> inventoryLevels = inventoryLevelRepository.findAllById(inventoryLevelIds);
         Map<Long, InventoryLevelDto> inventoryLevelDtoMap = inventoryLevelDtoList.stream().collect(Collectors.toMap(InventoryLevelDto::getInventoryId, dto -> dto));

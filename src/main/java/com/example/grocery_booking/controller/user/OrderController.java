@@ -4,7 +4,6 @@ import com.example.grocery_booking.dto.OrderDto;
 import com.example.grocery_booking.dto.request.CreateOrderRequest;
 import com.example.grocery_booking.dto.response.BaseResponse;
 import com.example.grocery_booking.dto.response.CreateOrderResponse;
-import com.example.grocery_booking.services.implementation.OrderServiceImpl;
 import com.example.grocery_booking.services.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user/order")
 public class OrderController {
 
+    private final OrderService orderService;
+
     @Autowired
-    private OrderService orderService;
-    @Autowired
-    private OrderServiceImpl orderServiceImpl;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping("")
     public ResponseEntity<Object> createOrder(@RequestBody @Valid CreateOrderRequest request) {
         try {
-            OrderDto orderDto = orderServiceImpl.createOrder(
+            OrderDto orderDto = orderService.createOrder(
                     OrderDto.builder()
                             .userId(request.getCustomerId())
                             .orderDetailDtos(request.getOrderDetails())

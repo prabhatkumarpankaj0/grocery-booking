@@ -19,27 +19,33 @@ import java.util.stream.Collectors;
 @Service
 public class GroceryItemServiceImpl implements GroceryItemService {
 
+    private final GroceryItemRepository groceryItemRepository;
+    private final InventoryLevelRepository inventoryLevelRepository;
+
     @Autowired
-    private GroceryItemRepository groceryItemRepository;
-    @Autowired
-    private InventoryLevelRepository inventoryLevelRepository;
+    public GroceryItemServiceImpl(GroceryItemRepository groceryItemRepository, InventoryLevelRepository inventoryLevelRepository) {
+        this.groceryItemRepository = groceryItemRepository;
+        this.inventoryLevelRepository = inventoryLevelRepository;
+    }
 
     @Override
     public void addOrUpdateGroceryItem(GroceryItemDto groceryItemDto) {
         GroceryItem groceryItem;
 
         if (Objects.nonNull(groceryItemDto.getId())) {
-            groceryItem = groceryItemRepository.findById(groceryItemDto.getId()).orElse(null);
+            groceryItem = groceryItemRepository.findById(groceryItemDto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Grocery item not found"));
+            groceryItem.setName(groceryItemDto.getName());
+            groceryItem.setDescription(groceryItemDto.getDescription());
+            groceryItem.setPrice(groceryItemDto.getPrice());
         } else {
             groceryItem = GroceryItem.builder()
                     .name(groceryItemDto.getName())
                     .description(groceryItemDto.getDescription())
-                    .price(groceryItemDto.getPrice()).build();
+                    .price(groceryItemDto.getPrice())
+                    .build();
         }
 
-        if (Objects.isNull(groceryItem)) {
-            throw new ResourceNotFoundException("Grocery Item Not Found");
-        }
         if (groceryItemDto.getId() == null) {
             inventoryLevelRepository.save(
                     InventoryLevel.builder()
@@ -74,7 +80,7 @@ public class GroceryItemServiceImpl implements GroceryItemService {
                         .price(groceryItem.getPrice())
                         .inventoryQuantity(groceryIdInventoryMap.get(groceryItem.getId()).getStock())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
 

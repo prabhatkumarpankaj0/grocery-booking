@@ -14,8 +14,12 @@ import java.util.List;
 @RequestMapping("/user/groceryItem")
 public class GroceryItemController {
 
+    private final GroceryItemService groceryItemService;
+
     @Autowired
-    private GroceryItemService groceryItemService;
+    public GroceryItemController(GroceryItemService groceryItemService) {
+        this.groceryItemService = groceryItemService;
+    }
 
     @GetMapping("/groceries")
     public GroceryItemResponse getAllGroceryItems() {

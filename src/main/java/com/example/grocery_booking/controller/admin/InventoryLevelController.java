@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/inventory")
 public class InventoryLevelController {
 
+    private final InventoryLevelService inventoryLevelService;
+
     @Autowired
-    private InventoryLevelService inventoryLevelService;
+    public InventoryLevelController(InventoryLevelService inventoryLevelService) {
+        this.inventoryLevelService = inventoryLevelService;
+    }
 
     @PostMapping("")
     public ResponseEntity<BaseResponse<Object>> updateInventoryLevels(@RequestBody UpdateInventoryLevelRequest request) {

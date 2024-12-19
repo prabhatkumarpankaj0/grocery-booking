@@ -17,16 +17,20 @@ import java.util.List;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final InventoryLevelRepository inventoryLevelRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+    private final GroceryItemRepository groceryItemRepository;
+
     @Autowired
-    private InventoryLevelRepository inventoryLevelRepository;
-    @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OrderRepository orderRepository;
-    @Autowired
-    private GroceryItemRepository groceryItemRepository;
+    public OrderServiceImpl(InventoryLevelRepository inventoryLevelRepository, OrderDetailRepository orderDetailRepository, UserRepository userRepository, OrderRepository orderRepository, GroceryItemRepository groceryItemRepository) {
+        this.inventoryLevelRepository = inventoryLevelRepository;
+        this.orderDetailRepository = orderDetailRepository;
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+        this.groceryItemRepository = groceryItemRepository;
+    }
 
     @Override
     public OrderDto createOrder(OrderDto requestOrderDto) {
