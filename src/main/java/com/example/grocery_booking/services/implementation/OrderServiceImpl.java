@@ -7,12 +7,13 @@ import com.example.grocery_booking.exception.ResourceNotFoundException;
 import com.example.grocery_booking.model.*;
 import com.example.grocery_booking.repository.*;
 import com.example.grocery_booking.services.service.OrderService;
-import com.example.grocery_booking.utils.MessageConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -39,18 +40,24 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("User not found")
                 );
+        List<Long> groceryItemIds = requestOrderDto.getOrderDetailDtos()
+                .stream()
+                .map(OrderDetailDto::getGroceryItemId)
+                .toList();
+        List<InventoryLevel> inventoryLevels = inventoryLevelRepository.findAllById(groceryItemIds);
+        Map<Long, InventoryLevel>  groceryItemIdInventoryMap = inventoryLevels.stream().collect(Collectors.toMap(inventoryLevel -> inventoryLevel.getGroceryItem().getId(), inventoryLevel -> inventoryLevel));
+        List<InventoryLevel> inventoryLevelList = new ArrayList<>();
         double totalPrice = 0.0;
         List<OrderDetailDto> responseOrderDetailDtos = new ArrayList<>();
 
         for (OrderDetailDto orderDetailDto : requestOrderDto.getOrderDetailDtos()) {
-            InventoryLevel inventoryLevel = inventoryLevelRepository.findByGroceryItem_Id(orderDetailDto.getGroceryItemId())
-                    .orElseThrow(() -> new ResourceNotFoundException(MessageConstant.GROCERY_ITEM_NOT_FOUND_IN_INVENTORY));
 
+            InventoryLevel inventoryLevel = groceryItemIdInventoryMap.get(orderDetailDto.getGroceryItemId());
             if (inventoryLevel.getStock() < orderDetailDto.getQuantity()) {
                 throw new CustomValidationException("Insufficient stock for item " + inventoryLevel.getGroceryItem().getName());
             }
             inventoryLevel.setStock(inventoryLevel.getStock() - orderDetailDto.getQuantity());
-            inventoryLevelRepository.save(inventoryLevel);
+            inventoryLevelList.add(inventoryLevel);
 
             double itemTotalPrice = inventoryLevel.getGroceryItem().getPrice() * orderDetailDto.getQuantity();
             totalPrice += itemTotalPrice;
@@ -64,6 +71,8 @@ public class OrderServiceImpl implements OrderService {
 
         }
 
+        //save inventory level
+        inventoryLevelRepository.saveAll(inventoryLevelList);
         //save Order
         Order order = Order.builder().user(user).totalPrice(totalPrice).build();
         orderRepository.save(order);

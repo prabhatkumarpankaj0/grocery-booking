@@ -46,6 +46,8 @@ public class GroceryItemServiceImpl implements GroceryItemService {
                     .build();
         }
 
+        groceryItemRepository.save(groceryItem);
+
         if (groceryItemDto.getId() == null) {
             inventoryLevelRepository.save(
                     InventoryLevel.builder()
@@ -54,14 +56,13 @@ public class GroceryItemServiceImpl implements GroceryItemService {
                             .build()
             );
         }
-        groceryItemRepository.save(groceryItem);
     }
 
     @Override
     @Transactional
     public void deleteGroceryItem(Long groceryItemId) {
-        groceryItemRepository.deleteById(groceryItemId);
         inventoryLevelRepository.deleteInventoryLevelByGroceryItem_Id(groceryItemId);
+        groceryItemRepository.deleteById(groceryItemId);
     }
 
     @Override
